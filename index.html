@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCSA Labs // HackTheBox Portal</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <div class="logo-icon">&gt;_</div>
+      <div>
+        <h1>CCSA <span>LABS</span></h1>
+        <div class="subtitle">Conestoga Cybersecurity Association</div>
+      </div>
+    </div>
+    <div class="nav-badges">
+      <div class="badge">🟢 Status: Online</div>
+      <div class="badge badge-cyan">🔒 Proxmox / Tailscale Lab</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-banner">
+      <h2>Welcome, CCSA Member!</h2>
+      <p>Select your mission below, download attack/defense scripts with one click, and copy-paste terminal commands directly into your Kali Linux VMs to get started instantly.</p>
+    </div>
+
+    <div class="section-title">
+      <span>🛡️ Active Labs & Challenges</span>
+    </div>
+
+    <div id="challenges-container" class="challenge-grid">
+      <!-- Dynamically populated by app.js -->
+      <p style="color: var(--text-muted);">Loading challenges...</p>
+    </div>
+  </main>
+
+  <footer>
+    Conestoga Cybersecurity Association (CCSA) &bull; Built for Hands-On Red vs. Blue Training
+  </footer>
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>

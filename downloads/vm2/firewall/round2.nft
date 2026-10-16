@@ -1,0 +1,87 @@
+
+#!/usr/sbin/nft -f
+#
+# round2.nft - Round 1 defense PLUS synproxy, to defeat SPOOFED source IPs.
+#
+#   Attack : syn better 0.0.0.0 10.2.0.4 80 <count>   (fresh fake IP per packet)
+#   Load   : sudo nft -f round2.nft        (or just:  sudo ./round2.sh)
+#   Remove : sudo nft delete table inet defense   (or:  sudo ./flush.sh)
+#
+#   REQUIRES: sysctl -w net.netfilter.nf_conntrack_tcp_loose=0
+#             (round2.sh does this for you)
+#
+# WHY ROUND 1 ISN'T ENOUGH
+#   With spoofing, every packet carries a brand-new fake source IP, so the
+#   per-source buckets never fill and the ban list never repeats. Source-based
+#   rules are useless. The firewall has to become HANDSHAKE-AWARE instead.
+#
+# WHAT SYNPROXY ADDS
+#   * raw/prerouting marks tcp/80 SYNs "notrack" (stateless)
+#   * the firewall ANSWERS the SYN with its own SYN-ACK and only forwards the
+#     connection to game.py after the client proves it is real (final ACK).
+#   * spoofed hosts never ACK -> no SYN ever reaches game.py's listen backlog.
+#
+# This file is round1.nft + the synproxy pair. Everything else is identical.
+
+table inet defense {
+
+    # NO timeout: a banned source stays banned for the life of this ruleset.
+    set synflood {
+        type ipv4_addr
+        flags dynamic
+        size 65535
+    }
+
+    # ------------------------------------------------------------------
+    # raw/prerouting: strip connection tracking from tcp/80 SYNs so that
+    # synproxy (in the input chain) is allowed to own the handshake.
+    # Everything that is NOT a tcp/80 SYN keeps normal conntrack.
+    # ------------------------------------------------------------------
+    chain raw_prerouting {
+        type filter hook prerouting priority raw; policy accept;
+
+        tcp dport 80 tcp flags syn notrack
+    }
+
+    chain input {
+        type filter hook input priority filter; policy accept;
+
+        iif lo accept
+        ct state established,related accept
+
+        # ==============================================================
+        # ROUND 1: same-source-IP defense (ban + rate limit)
+        # ==============================================================
+        ip saddr @synflood counter drop
+
+        tcp dport 80 tcp flags syn \
+            meter syn_block { ip saddr limit rate over 50/second burst 100 packets } \
+            add @synflood { ip saddr } counter
+
+        tcp dport 80 tcp flags syn \
+            meter syn_per_src { ip saddr limit rate over 20/second burst 40 packets } \
+            counter drop
+
+        # ==============================================================
+        # ROUND 2: defeat SPOOFED sources -- the firewall completes the
+        # 3-way handshake itself. Spoofed clients never finish it, so
+        # game.py's backlog is never touched.
+        # ==============================================================
+        tcp dport 80 ct state untracked,invalid \
+            synproxy mss 1460 wscale 7 timestamp sack-perm
+
+        ct state invalid drop
+
+        # ==============================================================
+        # FALLBACK (only if synproxy is unavailable / misbehaving):
+        #   comment out the synproxy pair above, enable the cap below,
+        #   and run: sysctl -w net.ipv4.tcp_syncookies=1
+        # ==============================================================
+        # tcp dport 80 tcp flags syn limit rate over 200/second burst 400 packets drop
+
+        # the game itself
+        tcp dport 80 accept
+
+        ct state new accept
+    }
+}
