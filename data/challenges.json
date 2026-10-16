@@ -36,8 +36,14 @@
         }
       ],
       "downloads": [
-        { "name": "syn.c (Raw Socket C Attack Program)", "path": "downloads/vm1/syn.c" },
-        { "name": "attacker_rst_block.sh (RST Suppressor Helper)", "path": "downloads/vm1/attacker_rst_block.sh" }
+        {
+          "name": "syn.c (Raw Socket C Attack Program)",
+          "path": "downloads/vm1/syn.c"
+        },
+        {
+          "name": "attacker_rst_block.sh (RST Suppressor Helper)",
+          "path": "downloads/vm1/attacker_rst_block.sh"
+        }
       ]
     },
     "vm2": {
@@ -55,11 +61,11 @@
       "commands": [
         {
           "label": "1. Start Game Server",
-          "cmd": "sudo bash VM-2/start_game.sh &"
+          "cmd": "sudo bash start_game.sh &"
         },
         {
           "label": "2. Stop Game Server",
-          "cmd": "sudo pkill -f VM-2/game.py"
+          "cmd": "sudo bash stop_game.sh"
         },
         {
           "label": "3. Apply Round 1 Defense (Rate Limiting)",
@@ -71,12 +77,34 @@
         }
       ],
       "downloads": [
-        { "name": "game.py (Fragile Web Server + Snake Game)", "path": "downloads/vm2/game.py" },
-        { "name": "round1.sh (Round 1 Defense Script)", "path": "downloads/vm2/firewall/round1.sh" },
-        { "name": "round1.nft (nftables Rate-Limit Ruleset)", "path": "downloads/vm2/firewall/round1.nft" },
-        { "name": "round2.sh (Round 2 SYNPROXY Script)", "path": "downloads/vm2/firewall/round2.sh" },
-        { "name": "round2.nft (nftables SYNPROXY Ruleset)", "path": "downloads/vm2/firewall/round2.nft" },
-        { "name": "start_game.sh (Start Game Helper Script)", "path": "downloads/vm2/start_game.sh" }
+        {
+          "name": "game.py (Fragile Web Server + Snake Game)",
+          "path": "downloads/vm2/game.py"
+        },
+        {
+          "name": "round1.sh (Round 1 Defense Script)",
+          "path": "downloads/vm2/firewall/round1.sh"
+        },
+        {
+          "name": "round1.nft (nftables Rate-Limit Ruleset)",
+          "path": "downloads/vm2/firewall/round1.nft"
+        },
+        {
+          "name": "round2.sh (Round 2 SYNPROXY Script)",
+          "path": "downloads/vm2/firewall/round2.sh"
+        },
+        {
+          "name": "round2.nft (nftables SYNPROXY Ruleset)",
+          "path": "downloads/vm2/firewall/round2.nft"
+        },
+        {
+          "name": "start_game.sh (Start Game Helper Script)",
+          "path": "downloads/vm2/start_game.sh"
+        },
+        {
+          "name": "stop_game.sh (Stop Game Helper Script)",
+          "path": "downloads/vm2/stop_game.sh"
+        }
       ]
     }
   }
