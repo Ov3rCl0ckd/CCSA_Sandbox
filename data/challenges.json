@@ -1,0 +1,83 @@
+[
+  {
+    "id": "operation-syn-flood",
+    "title": "Operation SYN Flood: Red vs. Blue",
+    "category": "Networking & DDoS Defense",
+    "difficulty": "Beginner Friendly",
+    "overview": "Welcome to CCSA Session 1! This hands-on lab teaches you how a TCP SYN Flood attack works at the network socket level and how system administrators defend live servers using Linux netfilter firewalls (nftables) and SYN Cookies. You will experience firsthand why fragile web servers collapse under connection exhaustion and how modern kernel-level proxying saves them.",
+    "vm1": {
+      "title": "VM-1: Red Team (Attacker / Kali Linux)",
+      "goal": "Exhaust the target web server's connection queue using custom raw socket C programs, and bypass local kernel connection resets.",
+      "dos": [
+        "DO review syn.c to understand how raw sockets and libnet craft custom TCP SYN packets with randomized source ports.",
+        "DO run the attacker RST suppressor script before flooding so your Linux kernel doesn't tear down half-open connections.",
+        "DO experiment with both Mode 1 (Regular SYN flood) and Mode 2 (IP-spoofed SYN flood)."
+      ],
+      "donts": [
+        "DON'T run the attack against real external IP addresses or networks outside your assigned CCSA lab subnet.",
+        "DON'T forget to compile with root privileges (sudo) when injecting raw packets."
+      ],
+      "commands": [
+        {
+          "label": "Step 1: Install libnet compilation dependencies",
+          "cmd": "sudo apt-get update && sudo apt-get install build-essential libnet-dev -y"
+        },
+        {
+          "label": "Step 2: Compile the custom C attack tool",
+          "cmd": "gcc -O2 -o syn VM-1/syn.c -lnet"
+        },
+        {
+          "label": "Step 3: Block outgoing kernel RST packets (Crucial for regular flood)",
+          "cmd": "sudo bash VM-1/attacker_rst_block.sh apply"
+        },
+        {
+          "label": "Step 4: Launch the interactive attack tool",
+          "cmd": "sudo ./syn"
+        }
+      ],
+      "downloads": [
+        { "name": "syn.c (Raw Socket C Attack Program)", "path": "downloads/vm1/syn.c" },
+        { "name": "attacker_rst_block.sh (RST Suppressor Helper)", "path": "downloads/vm1/attacker_rst_block.sh" }
+      ]
+    },
+    "vm2": {
+      "title": "VM-2: Blue Team (Defender / Target Server)",
+      "goal": "Host a fragile web application running a live Snake game, monitor its connection health, and implement robust nftables firewall defenses.",
+      "dos": [
+        "DO start the fragile game server and observe how the frontend instantly detects connection drops when the SYN flood lands.",
+        "DO examine Round 1 nftables rules to understand per-IP rate limiting and connection tracking thresholds.",
+        "DO test Round 2 SYNPROXY mode where the Linux kernel answers handshakes on behalf of the application."
+      ],
+      "donts": [
+        "DON'T leave firewall rules flushing dangling rules without testing SSH connectivity first (or you'll lock yourself out!).",
+        "DON'T skip verifying kernel netfilter conntrack settings when enabling SYNPROXY."
+      ],
+      "commands": [
+        {
+          "label": "1. Start Game Server",
+          "cmd": "sudo bash VM-2/start_game.sh &"
+        },
+        {
+          "label": "2. Stop Game Server",
+          "cmd": "sudo pkill -f VM-2/game.py"
+        },
+        {
+          "label": "3. Apply Round 1 Defense (Rate Limiting)",
+          "cmd": "sudo bash VM-2/firewall/round1.sh"
+        },
+        {
+          "label": "4. Apply Round 2 Defense (SYNPROXY)",
+          "cmd": "sudo bash VM-2/firewall/round2.sh"
+        }
+      ],
+      "downloads": [
+        { "name": "game.py (Fragile Web Server + Snake Game)", "path": "downloads/vm2/game.py" },
+        { "name": "round1.sh (Round 1 Defense Script)", "path": "downloads/vm2/firewall/round1.sh" },
+        { "name": "round1.nft (nftables Rate-Limit Ruleset)", "path": "downloads/vm2/firewall/round1.nft" },
+        { "name": "round2.sh (Round 2 SYNPROXY Script)", "path": "downloads/vm2/firewall/round2.sh" },
+        { "name": "round2.nft (nftables SYNPROXY Ruleset)", "path": "downloads/vm2/firewall/round2.nft" },
+        { "name": "start_game.sh (Start Game Helper Script)", "path": "downloads/vm2/start_game.sh" }
+      ]
+    }
+  }
+]
