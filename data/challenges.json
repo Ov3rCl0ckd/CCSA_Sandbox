@@ -54,15 +54,19 @@
       ],
       "commands": [
         {
-          "label": "Step 1: Run the fragile web server & Snake game",
-          "cmd": "sudo python3 VM-2/game.py"
+          "label": "1. Start Game Server",
+          "cmd": "sudo python3 VM-2/game.py &"
         },
         {
-          "label": "Step 2: Apply Round 1 Defense (Per-IP Rate Limit & Ban)",
+          "label": "2. Stop Game Server",
+          "cmd": "sudo pkill -f VM-2/game.py"
+        },
+        {
+          "label": "3. Apply Round 1 Defense (Rate Limiting)",
           "cmd": "sudo bash VM-2/firewall/round1.sh"
         },
         {
-          "label": "Step 3: Apply Round 2 Defense (Kernel SYNPROXY Cookie Shield)",
+          "label": "4. Apply Round 2 Defense (SYNPROXY)",
           "cmd": "sudo bash VM-2/firewall/round2.sh"
         }
       ],
