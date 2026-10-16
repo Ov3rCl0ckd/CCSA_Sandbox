@@ -15,7 +15,7 @@
       ],
       "donts": [
         "DON'T run the attack against real external IP addresses or networks outside your assigned CCSA lab subnet.",
-        "DON'T forget to compile with root privileges (`sudo`) when injecting raw packets."
+        "DON'T forget to compile with root privileges (sudo) when injecting raw packets."
       ],
       "commands": [
         {
@@ -55,7 +55,7 @@
       "commands": [
         {
           "label": "1. Start Game Server",
-          "cmd": "sudo python3 VM-2/game.py &"
+          "cmd": "sudo bash VM-2/start_game.sh &"
         },
         {
           "label": "2. Stop Game Server",
@@ -75,7 +75,8 @@
         { "name": "round1.sh (Round 1 Defense Script)", "path": "downloads/vm2/firewall/round1.sh" },
         { "name": "round1.nft (nftables Rate-Limit Ruleset)", "path": "downloads/vm2/firewall/round1.nft" },
         { "name": "round2.sh (Round 2 SYNPROXY Script)", "path": "downloads/vm2/firewall/round2.sh" },
-        { "name": "round2.nft (nftables SYNPROXY Ruleset)", "path": "downloads/vm2/firewall/round2.nft" }
+        { "name": "round2.nft (nftables SYNPROXY Ruleset)", "path": "downloads/vm2/firewall/round2.nft" },
+        { "name": "start_game.sh (Start Game Helper Script)", "path": "downloads/vm2/start_game.sh" }
       ]
     }
   }
